@@ -1,0 +1,28 @@
+# Local development stack only: Keycloak for authentication and Oracle XE as the
+# database. The application itself runs from your IDE or via `mvn spring-boot:run`.
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8180
+      KC_HOSTNAME_STRICT: "false"
+    ports:
+      - "8180:8180"
+
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    environment:
+      ORACLE_PASSWORD: mt940
+      ORACLE_DATABASE: XEPDB1
+      APP_USER: MT940_APP
+      APP_USER_PASSWORD: mt940
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+volumes:
+  oracle-data:

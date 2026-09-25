@@ -1,0 +1,35 @@
+# Local development / demonstration profile.
+# Uses an in-memory H2 database so the application boots anywhere without an
+# Oracle instance.  Schema is generated from the JPA mappings; the Flyway
+# migration scripts under db/migration are Oracle-specific and are disabled here.
+spring:
+  datasource:
+    url: jdbc:h2:mem:mt940db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=USER,VALUE
+    username: sa
+    password: ''
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 30
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  flyway:
+    enabled: false
+
+mt940:
+  security:
+    # Allows running the portal without a Keycloak server while developing.
+    # NEVER enable this in production.
+    dev-bypass:
+      enabled: ${DEV_AUTH_BYPASS:false}
+      username: ${DEV_AUTH_USER:dev.maker}
+      full-name: Development Maker
+      roles: ${DEV_AUTH_ROLES:MT940_MAKER,MT940_VIEWER}

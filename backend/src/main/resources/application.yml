@@ -1,0 +1,150 @@
+server:
+  port: ${PORT:8080}
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: mt940-portal
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+  mvc:
+    problemdetails:
+      enabled: true
+
+# ---------------------------------------------------------------------------
+# Keycloak.  The backend is a pure OAuth2 resource server: it only validates
+# the bearer token issued by Keycloak, it never redirects to a login page.
+# ---------------------------------------------------------------------------
+spring.security.oauth2.resourceserver.jwt:
+  issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/mt940}
+
+mt940:
+  # Optional override of the JWKS URL, needed when Keycloak sits behind a
+  # reverse proxy and the advertised issuer host is not reachable from here.
+  keycloak.jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:}
+
+  cors.allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+  security:
+    # Realm role -> application authority mapping.
+    role-prefix: ROLE_
+    # Realm roles recognised by this application.
+    maker-role: ${MT940_MAKER_ROLE:MT940_MAKER}
+    checker-role: ${MT940_CHECKER_ROLE:MT940_CHECKER}
+    admin-role: ${MT940_ADMIN_ROLE:MT940_ADMIN}
+    viewer-role: ${MT940_VIEWER_ROLE:MT940_VIEWER}
+
+  # -------------------------------------------------------------------------
+  # Core banking transaction endpoint
+  # -------------------------------------------------------------------------
+  transaction-source:
+    base-url: ${TXN_BASE_URL:http://192.168.12.47:5468}
+    path: ${TXN_PATH:/phiBela/getAmboTransaction}
+    connect-timeout-ms: 5000
+    read-timeout-ms: 30000
+    # Date pattern expected by the core banking endpoint: 01-Sep-26
+    date-pattern: dd-MMM-yy
+    auth:
+      enabled: ${TXN_AUTH_ENABLED:false}
+      header-name: Authorization
+      token: ${TXN_AUTH_TOKEN:}
+
+  # -------------------------------------------------------------------------
+  # SWIFT rendering defaults (can be overridden per client)
+  # -------------------------------------------------------------------------
+  swift:
+    sender-lt-address: ${SWIFT_SENDER_LT_ADDRESS:DASHETAXXXXX}
+    receiver-lt-address: ${SWIFT_RECEIVER_LT_ADDRESS:RECVETAAXXXX}
+    session-number: ${SWIFT_SESSION_NUMBER:0001}
+    isn-strategy: ${SWIFT_ISN_STRATEGY:MIRROR_STATEMENT_NUMBER} # MIRROR_STATEMENT_NUMBER | STATIC | ACCOUNT_SEQUENCE
+    static-isn: ${SWIFT_STATIC_ISN:000001}
+    priority: ${SWIFT_PRIORITY:N}
+    default-currency: ETB
+    # SWIFT FIN does not allow empty lines inside the text block. Set to true
+    # only if your downstream consumer expects them.
+    blank-line-between-tags: ${SWIFT_BLANK_LINES:false}
+    line-separator: ${SWIFT_LINE_SEPARATOR:LF} # LF | CRLF
+    reference-prefix: STMT
+    # :61: funds code. Your sample omits it; set to CURRENCY_THIRD_CHAR to emit it.
+    funds-code-strategy: ${SWIFT_FUNDS_CODE:NONE} # NONE | CURRENCY_THIRD_CHAR
+    default-transaction-type: NTRF
+    # :62F: (final) vs :62M: (interim)
+    closing-balance-tag: ${SWIFT_CLOSING_TAG:F} # F | M
+    opening-balance-tag: ${SWIFT_OPENING_TAG:F} # F | M
+    emit-13d: ${SWIFT_EMIT_13D:false}
+    emit-90d: ${SWIFT_EMIT_90D:false}
+    emit-64: ${SWIFT_EMIT_64:false}
+    emit-65: ${SWIFT_EMIT_65:false}
+    max-86-lines: 6
+    max-86-line-length: 65
+
+  # -------------------------------------------------------------------------
+  # Statement storage
+  # -------------------------------------------------------------------------
+  storage:
+    base-dir: ${MT940_STORAGE_DIR:./mt940-output}
+
+  # -------------------------------------------------------------------------
+  # Scheduling
+  # -------------------------------------------------------------------------
+  scheduler:
+    enabled: ${SCHEDULER_ENABLED:true}
+    # Zone used to interpret the per-schedule send time.
+    zone: ${SCHEDULER_ZONE:Africa/Addis_Ababa}
+    # How often the dispatcher wakes up (milliseconds).
+    poll-interval-ms: 60000
+    # Guards against a schedule firing twice on the same run.
+    misfire-threshold-minutes: 1440
+
+  # -------------------------------------------------------------------------
+  # Email delivery.  The real endpoint is plugged in through configuration;
+  # no code change is required when the URL/auth/payload template changes.
+  # -------------------------------------------------------------------------
+  email:
+    provider: ${EMAIL_PROVIDER:mock} # mock | rest
+    from-address: ${EMAIL_FROM:mt940-noreply@bank.local}
+    from-name: ${EMAIL_FROM_NAME:MT940 Statement Portal}
+    rest:
+      url: ${EMAIL_ENDPOINT_URL:}
+      auth:
+        enabled: ${EMAIL_AUTH_ENABLED:false}
+        header-name: ${EMAIL_AUTH_HEADER:Authorization}
+        token: ${EMAIL_AUTH_TOKEN:}
+      timeout-ms: 20000
+      # Placeholders resolved at send time:
+      # {{to}} {{cc}} {{bcc}} {{subject}} {{body}} {{fileName}} {{fileBase64}}
+      # {{clientCode}} {{clientName}} {{accountNumber}} {{periodFrom}} {{periodTo}}
+      payload-template: >
+        {"to":"{{to}}","cc":"{{cc}}","bcc":"{{bcc}}","subject":"{{subject}}",
+         "body":"{{body}}","attachments":[{"fileName":"{{fileName}}",
+         "contentType":"text/plain","contentBase64":"{{fileBase64}}"}]}
+    retry:
+      max-attempts: ${EMAIL_MAX_ATTEMPTS:3}
+      backoff-ms: ${EMAIL_BACKOFF_MS:5000}
+
+logging:
+  level:
+    com.bank.mt940portal: INFO
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

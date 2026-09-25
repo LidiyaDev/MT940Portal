@@ -47,6 +47,30 @@ pinned by `Mt940GeneratorTest`:
 See [docs/MT940-FORMAT.md](docs/MT940-FORMAT.md) for the field-by-field rules that were
 derived from it.
 
+## Testing
+
+See [docs/TESTING.md](docs/TESTING.md) for a level-by-level guide, from a two-minute UI
+click-through to running against the real core banking feed and Oracle.
+
+Fastest path to a meaningful test:
+
+```bash
+# 1. Stub the core banking feed and the email endpoint (no dependencies)
+node tools/mock-bank-services/server.mjs
+
+# 2. Backend on H2 with the auth bypass - no Oracle, no Keycloak
+cd backend && mvn test && mvn spring-boot:run -Dspring-boot.run.profiles=dev \
+  -Dspring-boot.run.arguments="--mt940.security.dev-bypass.enabled=true \
+  --mt940.security.dev-bypass.roles=MT940_MAKER,MT940_CHECKER,MT940_ADMIN \
+  --mt940.transaction-source.base-url=http://localhost:5468"
+
+# 3. UI against the real API
+cd frontend && echo "VITE_USE_MOCK=false" > .env.local && npm run dev
+```
+
+The unit tests pin the generator to the bank's sample statement, so `mvn test` fails
+immediately if the MT940 output ever drifts.
+
 ## Quick start
 
 ### Front end only (no backend required)
@@ -137,3 +161,13 @@ Further reading:
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — data model, request flow, scheduling
 - [docs/MT940-FORMAT.md](docs/MT940-FORMAT.md) — tag layout and per-client overrides
 - [docs/KEYCLOAK-SETUP.md](docs/KEYCLOAK-SETUP.md) — realm, client and role configuration
+- [docs/TESTING.md](docs/TESTING.md) — how to test at every level
+
+## Repository layout (including tooling)
+
+```
+backend/                    Spring Boot service (Maven, Java 17)
+frontend/                   React + Vite + TypeScript UI
+tools/mock-bank-services/   Zero-dependency stubs for the transaction feed and email endpoint
+docs/                       Architecture, MT940 format, Keycloak setup, testing
+```

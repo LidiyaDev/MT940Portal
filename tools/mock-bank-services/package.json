@@ -1,0 +1,13 @@
+{
+  "name": "mock-bank-services",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Zero-dependency stubs for the core banking transaction feed and the notification endpoint",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -52,9 +52,9 @@ export const db: {
       remarks: 'Daily statements requested by group treasury.',
       accountCount: 3,
       createdAt: daysAgo(120),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
       updatedAt: daysAgo(12),
-      updatedBy: 'maker.user',
+      updatedBy: 'abebe.maker',
     },
     {
       id: 2,
@@ -75,9 +75,9 @@ export const db: {
       statementNumberSeed: 0,
       accountCount: 2,
       createdAt: daysAgo(90),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
       updatedAt: daysAgo(40),
-      updatedBy: 'checker.user',
+      updatedBy: 'almaz.checker',
     },
     {
       id: 3,
@@ -96,7 +96,7 @@ export const db: {
       blankLineBetweenTags: false,
       accountCount: 1,
       createdAt: daysAgo(60),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
   ],
 
@@ -114,7 +114,7 @@ export const db: {
       lastStatementNumber: 20719,
       statementCount: 12,
       createdAt: daysAgo(120),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 102,
@@ -129,7 +129,7 @@ export const db: {
       lastStatementNumber: 4,
       statementCount: 4,
       createdAt: daysAgo(110),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 103,
@@ -144,7 +144,7 @@ export const db: {
       lastStatementNumber: 0,
       statementCount: 0,
       createdAt: daysAgo(100),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 201,
@@ -159,7 +159,7 @@ export const db: {
       lastStatementNumber: 31,
       statementCount: 31,
       createdAt: daysAgo(90),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 202,
@@ -174,7 +174,7 @@ export const db: {
       lastStatementNumber: 9,
       statementCount: 9,
       createdAt: daysAgo(88),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 301,
@@ -189,7 +189,7 @@ export const db: {
       lastStatementNumber: 2,
       statementCount: 2,
       createdAt: daysAgo(60),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
   ],
 
@@ -211,7 +211,7 @@ export const db: {
       nextRunAt: daysAhead(0.2),
       description: 'daily at 07:00',
       createdAt: daysAgo(100),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 502,
@@ -230,7 +230,7 @@ export const db: {
       nextRunAt: daysAhead(6),
       description: 'monthly on day 1 at 08:30',
       createdAt: daysAgo(80),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 503,
@@ -250,7 +250,7 @@ export const db: {
       nextRunAt: daysAhead(3),
       description: 'weekly on Monday at 06:45',
       createdAt: daysAgo(70),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
   ],
 
@@ -269,7 +269,7 @@ export const db: {
       enabled: true,
       isDefault: true,
       createdAt: daysAgo(100),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
     {
       id: 702,
@@ -285,7 +285,7 @@ export const db: {
       enabled: true,
       isDefault: true,
       createdAt: daysAgo(70),
-      createdBy: 'maker.user',
+      createdBy: 'abebe.maker',
     },
   ],
 
@@ -299,7 +299,7 @@ export const db: {
       entityLabel: '2 accounts for AMBO001',
       operation: 'CREATE',
       status: 'PENDING',
-      requestedBy: 'maker.user',
+      requestedBy: 'abebe.maker',
       requestedAt: daysAgo(0.3),
       requestReason: 'New collection accounts opened by branch 0114.',
       payloadJson: JSON.stringify(
@@ -324,7 +324,7 @@ export const db: {
       entityLabel: 'weekly on Monday at 06:45',
       operation: 'UPDATE',
       status: 'PENDING',
-      requestedBy: 'maker.user',
+      requestedBy: 'abebe.maker',
       requestedAt: daysAgo(0.5),
       requestReason: 'Board meeting moved from Monday to Tuesday.',
       payloadJson: JSON.stringify(
@@ -347,7 +347,7 @@ export const db: {
       entityLabel: 'LOGEX',
       operation: 'UPDATE',
       status: 'PENDING',
-      requestedBy: 'maker.user',
+      requestedBy: 'abebe.maker',
       requestedAt: daysAgo(1),
       requestReason: 'Suspension lifted after compliance sign-off.',
       payloadJson: JSON.stringify({ clientCode: 'LOGEX', status: 'ACTIVE' }, null, 2),
@@ -362,9 +362,9 @@ export const db: {
       entityLabel: 'DASHTRADE',
       operation: 'CREATE',
       status: 'APPROVED',
-      requestedBy: 'maker.user',
+      requestedBy: 'abebe.maker',
       requestedAt: daysAgo(91),
-      reviewedBy: 'checker.user',
+      reviewedBy: 'almaz.checker',
       reviewedAt: daysAgo(90),
       diffSummary: 'New record',
       selfApprovalBlocked: false,
@@ -569,7 +569,7 @@ export function buildStatement(account: Account, client: Client, periodFrom: str
     status: 'GENERATED',
     deliveryStatus: 'PENDING',
     generatedAt: new Date().toISOString(),
-    generatedBy: 'demo.user',
+    generatedBy: 'abebe.maker',
     content,
   };
   return statement;
